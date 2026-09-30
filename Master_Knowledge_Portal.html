@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="en"><head><script src="https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.en.gh7qIZtzO5w.O/m=gapi_iframes/rt=j/sv=1/d=1/ed=1/rs=AHpOoo84YKT1RVy0T6hcXi5rH3LooB1WCw/cb=gapi.loaded_0?le=scs" async=""></script><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMDM3Mzk0MTc0NDA4NDk4Njk5MyIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjX2UxYmFmYzY5N2E4MzUyZmRfZGFzaGJvYXJkX3ByZXZpZXcuaHRtbC02MDkifSwiZXhwIjoxNzkwNjkwMDUwLCJpYXQiOjE3OTA2ODY0NTAsImFsZyI6IlJTMjU2In0.CrReKyTLRr0UwI42jvZHtVoRM1ORTA_f-I7oJ-e7hV-7kHKVxKmR1QLijWh48MIkMQZPwx20L12wRE0cLshqF4nntY6T3Fmh4Hgag8G23Ap0SlT3VI4LuRllJd-BF6AV3dCJYjlJphBqp2_sg7FpCbXYHB4TEGBB98gIwWekBrG04Nw6bsDZiZDwxZidgg3KSqTTOY674Nr3I5X0yScWSkG96kVgaq9rdgrdXF7y7DMkNSj2wBOnvHvd4Hl1xNBgJFIqavoA8fCyqWY_LEk-c2S_fSt_HIRh7i3gdpmmxeWEuRMO9PI5oWcifuB-TD-EI9ndEmrhTI9VCJYa5_csLQ","c_e1bafc697a8352fd_dashboard_preview.html-609")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.j=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.i="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Brand Knowledge &amp; Resource Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #020617;
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+        }
+        .brand-card {
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            will-change: transform;
+        }
+        .brand-card:hover {
+            transform: translateY(-2px);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.left-3\.5{left:0.875rem}.top-1\/2{top:50%}.z-50{z-index:50}.my-1{margin-top:0.25rem;margin-bottom:0.25rem}.my-auto{margin-top:auto;margin-bottom:auto}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mr-2{margin-right:0.5rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-2{height:0.5rem}.h-8{height:2rem}.h-14{height:3.5rem}.max-h-80{max-height:20rem}.max-h-\[90vh\]{max-height:90vh}.min-h-\[420px\]{min-height:420px}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-2{width:0.5rem}.w-8{width:2rem}.w-full{width:100%}.w-24{width:6rem}.max-w-2xl{max-width:42rem}.max-w-4xl{max-width:56rem}.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.max-w-full{max-width:100%}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}@keyframes ping{75%, 100%{transform:scale(2);opacity:0}}.animate-ping{animation:ping 1s cubic-bezier(0, 0, 0.2, 1) infinite}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-1{gap:0.25rem}.space-x-3\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.875rem * var(--tw-space-x-reverse));margin-left:calc(0.875rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-amber-500\/30{border-color:rgb(245 158 11 / 0.3)}.border-emerald-500\/30{border-color:rgb(16 185 129 / 0.3)}.border-indigo-500\/30{border-color:rgb(99 102 241 / 0.3)}.border-indigo-500\/40{border-color:rgb(99 102 241 / 0.4)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-slate-800\/80{border-color:rgb(30 41 59 / 0.8)}.border-amber-500\/40{border-color:rgb(245 158 11 / 0.4)}.border-blue-500\/40{border-color:rgb(59 130 246 / 0.4)}.border-indigo-500\/20{border-color:rgb(99 102 241 / 0.2)}.border-orange-500\/40{border-color:rgb(249 115 22 / 0.4)}.border-red-500\/40{border-color:rgb(239 68 68 / 0.4)}.border-slate-500\/40{border-color:rgb(100 116 139 / 0.4)}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-emerald-500\/20{background-color:rgb(16 185 129 / 0.2)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-emerald-950\/50{background-color:rgb(2 44 34 / 0.5)}.bg-indigo-500\/20{background-color:rgb(99 102 241 / 0.2)}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-indigo-600\/20{background-color:rgb(79 70 229 / 0.2)}.bg-red-600{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/90{background-color:rgb(15 23 42 / 0.9)}.bg-slate-950{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.bg-slate-950\/50{background-color:rgb(2 6 23 / 0.5)}.bg-slate-950\/60{background-color:rgb(2 6 23 / 0.6)}.bg-slate-950\/80{background-color:rgb(2 6 23 / 0.8)}.bg-indigo-500\/10{background-color:rgb(99 102 241 / 0.1)}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.bg-emerald-950\/80{background-color:rgb(2 44 34 / 0.8)}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-orange-600{--tw-gradient-from:#ea580c var(--tw-gradient-from-position);--tw-gradient-to:rgb(234 88 12 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-red-600{--tw-gradient-from:#dc2626 var(--tw-gradient-from-position);--tw-gradient-to:rgb(220 38 38 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-slate-700{--tw-gradient-from:#334155 var(--tw-gradient-from-position);--tw-gradient-to:rgb(51 65 85 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-zinc-900{--tw-gradient-from:#18181b var(--tw-gradient-from-position);--tw-gradient-to:rgb(24 24 27 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-amber-950{--tw-gradient-to:#451a03 var(--tw-gradient-to-position)}.to-black{--tw-gradient-to:#000 var(--tw-gradient-to-position)}.to-indigo-900{--tw-gradient-to:#312e81 var(--tw-gradient-to-position)}.to-rose-950{--tw-gradient-to:#4c0519 var(--tw-gradient-to-position)}.to-slate-950{--tw-gradient-to:#020617 var(--tw-gradient-to-position)}.p-1{padding:0.25rem}.p-12{padding:3rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-1\.5{padding:0.375rem}.p-2\.5{padding:0.625rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-2{padding-bottom:0.5rem}.pb-3{padding-bottom:0.75rem}.pl-9{padding-left:2.25rem}.pr-1{padding-right:0.25rem}.pr-4{padding-right:1rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.tracking-wider{letter-spacing:0.05em}.tracking-tight{letter-spacing:-0.025em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-indigo-200{--tw-text-opacity:1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}.text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-amber-200{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.placeholder-slate-500::placeholder{--tw-placeholder-opacity:1;color:rgb(100 116 139 / var(--tw-placeholder-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-emerald-600\/20{--tw-shadow-color:rgb(5 150 105 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-indigo-600\/20{--tw-shadow-color:rgb(79 70 229 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-red-600\/20{--tw-shadow-color:rgb(220 38 38 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-xl{--tw-backdrop-blur:blur(24px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:border-indigo-500:hover{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.hover\:border-emerald-500:hover{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.hover\:border-indigo-500\/40:hover{border-color:rgb(99 102 241 / 0.4)}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-500:hover{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.hover\:bg-red-500:hover{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-600:hover{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-600:hover{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.hover\:text-indigo-300:hover{--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:border-indigo-500:focus{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.disabled\:opacity-40:disabled{opacity:0.4}.group:hover .group-hover\:scale-105{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.group:hover .group-hover\:text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.group:hover .group-hover\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:inline{display:inline}.sm\:h-16{height:4rem}.sm\:w-28{width:7rem}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:justify-end{justify-content:flex-end}.sm\:gap-3{gap:0.75rem}.sm\:gap-2{gap:0.5rem}.sm\:gap-4{gap:1rem}.sm\:p-6{padding:1.5rem}.sm\:p-8{padding:2rem}.sm\:p-5{padding:1.25rem}.sm\:px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.sm\:px-8{padding-left:2rem;padding-right:2rem}.sm\:py-2{padding-top:0.5rem;padding-bottom:0.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:p-8{padding:2rem}}</style><script src="https://apis.google.com/js/api.js?onload=__iframefcb597642" type="text/javascript" charset="UTF-8" gapi_processed="true"></script></head>
+<body class="min-h-screen p-2 sm:p-6 md:p-8 bg-slate-950 flex flex-col items-center justify-start text-slate-100">
+
+    <div class="w-full max-w-6xl bg-slate-900/90 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden my-auto backdrop-blur-xl">
+        
+        <!-- Top Executive Bar -->
+        <div class="glass-header border-b border-slate-800 px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold text-lg shadow-inner">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-white text-base sm:text-lg tracking-wider block uppercase">KNOWLEDGE PORTAL</span>
+                    <span class="text-[11px] text-slate-400 font-medium block mt-0.5">Master Brand Study Notes &amp; Cross-Device Hub</span>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Sync Status Badge -->
+                <div id="syncStatusBadge" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-2 shadow-sm">
+                    <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="syncStatusText">Cloud Synced</span>
+                </div>
+
+                <!-- Save Now Button -->
+                <button id="manualSyncBtn" onclick="manualCloudSyncAll()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl font-semibold text-xs transition flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:scale-95" title="Force Save All Folders to Cloud">
+                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+                    <span>Save &amp; Sync</span>
+                </button>
+
+                <!-- Restore Default Brands Button for Mobile & PC -->
+                <button onclick="restoreAllDefaultBrands()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl font-semibold text-xs transition flex items-center gap-1.5 active:scale-95" title="Reload all default brand folders">
+                    <i class="fa-solid fa-rotate text-amber-400 text-xs"></i>
+                    <span class="hidden sm:inline">Reset Defaults</span>
+                </button>
+
+                <div id="adminBadge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl font-bold text-[11px] items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-shield-halved text-xs"></i>
+                    <span>Admin</span>
+                </div>
+
+                <button id="adminAuthBtn" onclick="toggleAdminAuth()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl font-semibold text-xs transition flex items-center gap-1.5 active:scale-95">
+                    <i id="adminAuthIcon" class="fa-solid fa-lock"></i>
+                    <span id="adminAuthText">Admin Login</span>
+                </button>
+
+                <button onclick="downloadPortalHtml()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 active:scale-95" title="Download Complete HTML File">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden sm:inline">Download</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-8 space-y-6">
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+                <div class="relative flex-1 max-w-md">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" onkeyup="filterDirectory()" placeholder="Search brand folder or document name..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition shadow-inner">
+                </div>
+
+                <div class="flex items-center gap-3 justify-between sm:justify-end">
+                    <div class="flex items-center gap-3 bg-slate-950/80 px-3 py-2 rounded-xl border border-slate-800 text-[11px]">
+                        <span class="text-slate-400">Folders: <strong id="statTotalBrands" class="text-white font-bold">6</strong></span>
+                        <span class="text-slate-700">|</span>
+                        <span class="text-slate-400">Files: <strong id="statTotalFiles" class="text-white font-bold">7</strong></span>
+                    </div>
+
+                    <button onclick="openAddBrandModal()" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold text-xs transition shadow-lg shadow-indigo-600/20 active:scale-95">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Add Brand Folder</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="brandGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('Apple')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-zinc-900 to-black border-amber-500/40 text-amber-200 border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">Apple</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('Apple')">Apple</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>1 File</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('Apple')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('Apple')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('boAt')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-red-600 to-rose-950 border-red-500/40 text-white border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">boAt</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('boAt')">boAt</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>1 File</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('boAt')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('boAt')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('JBL')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-orange-600 to-amber-950 border-orange-500/40 text-white border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">JBL</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('JBL')">JBL</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>1 File</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('JBL')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('JBL')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('Marshall')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-zinc-900 to-black border-amber-500/40 text-amber-200 border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">Marshall</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('Marshall')">Marshall</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>2 Files</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('Marshall')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('Marshall')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('Panasonic')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-900 border-blue-500/40 text-white border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">Panasonic</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('Panasonic')">Panasonic</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>1 File</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('Panasonic')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('Panasonic')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div><div class="brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group">
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('Sony')">
+                                
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-slate-700 to-slate-950 border-slate-500/40 text-white border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">Sony</span>
+                    </div>
+                
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('Sony')">Sony</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>1 File</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('Sony')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('Sony')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            
+                        </div>
+                    </div></div>
+
+            <!-- Empty State Notice -->
+            <div id="emptyState" class="hidden p-12 text-center rounded-2xl border border-dashed border-slate-800 bg-slate-950/50">
+                <i class="fa-solid fa-folder-open text-4xl text-slate-600 mb-3"></i>
+                <h3 class="text-slate-300 font-bold text-sm">No Brand Folders Found</h3>
+                <p class="text-slate-500 text-xs mt-1">Click "Add Brand Folder" above to create your first repository.</p>
+            </div>
+
+            <!-- Status Alert Banner -->
+            <div id="statusAlert" class="p-4 rounded-xl text-xs font-semibold bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 transition shadow-md hidden">📥 Portal HTML file downloaded to your device!</div>
+
+        </div>
+    </div>
+
+    <div id="adminPassModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs border border-indigo-500/30">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <span class="font-bold text-sm text-white">Administrator Access</span>
+                </div>
+                <button onclick="closeModal('adminPassModal')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <p class="text-slate-400">Enter your secure admin key to unlock folder management and file deletion.</p>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">Security Password</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Enter password" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" onkeyup="if(event.key==='Enter') verifyAdminPassword()">
+                    <p id="adminPassError" class="text-red-400 text-[11px] mt-2 hidden font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-exclamation text-xs"></i> Incorrect password. Access denied.
+                    </p>
+                </div>
+                <div class="pt-2 flex justify-end gap-2.5">
+                    <button onclick="closeModal('adminPassModal')" class="px-4 py-2.5 rounded-xl font-semibold text-slate-400 hover:bg-slate-800 transition">Cancel</button>
+                    <button onclick="verifyAdminPassword()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-600/20">
+                        Unlock Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="folderModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div id="folderModalLogo" class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                        <!-- Dynamic Logo -->
+                    </div>
+                    <div>
+                        <span id="folderModalTitle" class="font-bold text-sm text-white block">Brand Documents Directory</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Click any document to open full preview</span>
+                    </div>
+                </div>
+                <button onclick="closeModal('folderModal')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 bg-slate-950/60 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <p class="text-xs font-medium text-slate-400">PDFs, Word Docs &amp; Images in this brand repository:</p>
+                    <button onclick="closeModal('folderModal'); triggerUploadForBrand(currentFolderBrand);" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl font-semibold transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Add Document
+                    </button>
+                </div>
+                
+                <!-- Dynamic Folder File Cards -->
+                <div id="folderFileList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    <!-- Files injected dynamically via JS -->
+                </div>
+            </div>
+            <div class="bg-slate-950 border-t border-slate-800 px-6 py-3.5 flex justify-between items-center">
+                <button onclick="manualCloudSyncAll()" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Sync Folder Now
+                </button>
+                <button onclick="closeModal('folderModal')" class="bg-slate-800 text-slate-200 px-5 py-2 rounded-xl text-xs font-semibold hover:bg-slate-700 transition">Close Directory</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdfModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800 flex-shrink-0">
+                <div class="flex items-center gap-2.5 truncate mr-2">
+                    <i id="previewTypeIcon" class="fa-solid fa-file-pdf text-red-400 text-base"></i>
+                    <span id="pdfTitle" class="font-bold text-sm text-white truncate">Document Viewer</span>
+                </div>
+                <div class="flex items-center gap-2.5 flex-shrink-0">
+                    <a id="externalOpenBtn" href="#" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                        <span>Open Original File</span>
+                    </a>
+                    <button onclick="closeModal('pdfModal')" class="text-slate-400 hover:text-white transition p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+            
+            <div id="pdfPreviewContainer" class="p-4 sm:p-6 bg-slate-950 flex-1 overflow-y-auto min-h-[420px]">
+                <!-- Dynamic content injected via openDocumentFile() -->
+            </div>
+
+            <div class="bg-slate-950 border-t border-slate-800 px-6 py-3 flex justify-end flex-shrink-0">
+                <button onclick="closeModal('pdfModal')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded-xl text-xs font-semibold transition">Done Reading</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-800">
+            <div class="bg-indigo-600 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                    <span id="uploadModalTitle" class="font-bold text-sm">Upload &amp; Sync Document</span>
+                </div>
+                <button onclick="closeModal('uploadModal')" class="text-indigo-200 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <p class="text-slate-300">Select a PDF, Word Document, or Image note to attach to <strong id="targetBrandName" class="text-indigo-400">Brand Folder</strong>.</p>
+                
+                <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-indigo-500/30 hover:border-indigo-500 bg-slate-950/60 rounded-2xl p-6 text-center cursor-pointer transition">
+                    <i class="fa-solid fa-file-circle-plus text-3xl text-indigo-400 mb-2"></i>
+                    <p class="font-bold text-slate-200">Click to choose file or drag &amp; drop</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Supports PDF (.pdf), Word (.docx), or Photos (.png, .jpg)</p>
+                    <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFileSelected(event)">
+                </div>
+
+                <div id="fileSelectedInfo" class="hidden bg-emerald-950/50 border border-emerald-500/30 rounded-xl p-3 text-emerald-300 flex items-center justify-between">
+                    <div class="flex items-center gap-2 truncate">
+                        <i class="fa-solid fa-file-arrow-up text-emerald-400"></i>
+                        <span id="selectedFileName" class="font-bold truncate">my_file.pdf</span>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-extrabold">READY</span>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 flex justify-end gap-2.5">
+                    <button onclick="closeModal('uploadModal')" class="px-4 py-2.5 rounded-xl font-semibold text-slate-400 hover:bg-slate-800 transition">Cancel</button>
+                    <button id="saveUploadBtn" onclick="saveUploadedDocument()" disabled="" class="bg-indigo-600 disabled:opacity-40 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-600/20 flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Upload &amp; Save to Cloud</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addBrandModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-folder-plus text-indigo-400 text-base"></i>
+                    <span class="font-bold text-sm text-white">Create New Brand Folder</span>
+                </div>
+                <button onclick="closeModal('addBrandModal')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <!-- Live Logo Style Preview Box -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-2">
+                    <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Live Logo Preview</span>
+                    <div id="brandLogoPreview" class="flex justify-center my-1">
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-900 border-blue-500/40 text-white border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">New Brand</span>
+                    </div>
+                </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">Brand Name</label>
+                    <input type="text" id="newBrandName" onkeyup="updateBrandPreview()" placeholder="e.g. Panasonic, Sennheiser, Samsung, Apple" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">Color Theme</label>
+                    <select id="newBrandTheme" onchange="updateBrandPreview()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                        <option value="blue">Royal Blue</option>
+                        <option value="red">Crimson Red</option>
+                        <option value="dark">Midnight Black</option>
+                        <option value="amber">Luxury Gold</option>
+                        <option value="emerald">Emerald Green</option>
+                        <option value="purple">Cyber Purple</option>
+                        <option value="cyan">Neon Cyan / Teal</option>
+                        <option value="orange">Sunset Orange</option>
+                        <option value="rose">Rose Pink</option>
+                        <option value="violet">Deep Violet</option>
+                        <option value="slate">Titanium Slate</option>
+                        <option value="lime">Electric Lime</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">Initial Document Title</label>
+                    <input type="text" id="newDocName" placeholder="e.g. Product_Overview_2026.pdf" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 flex justify-end gap-2.5">
+                    <button onclick="closeModal('addBrandModal')" class="px-4 py-2.5 rounded-xl font-semibold text-slate-400 hover:bg-slate-800 transition">Cancel</button>
+                    <button onclick="addNewBrandRow()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-600/20 flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Create &amp; Save Folder</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span class="font-bold text-sm text-white">Confirm Action</span>
+                </div>
+                <button onclick="closeModal('confirmModal')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <p id="confirmModalText" class="text-slate-300">Are you sure you want to perform this action?</p>
+                <div class="flex justify-end gap-2.5">
+                    <button onclick="closeModal('confirmModal')" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:bg-slate-800 transition">Cancel</button>
+                    <button id="confirmModalActionBtn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition shadow-md shadow-red-600/20">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'master-knowledge-portal';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-key",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+
+        let app, auth, db;
+        let currentUser = null;
+
+        window.updateSyncUIState = function(state) {
+            const badge = document.getElementById('syncStatusBadge');
+            const dot = document.getElementById('syncDot');
+            const text = document.getElementById('syncStatusText');
+            if (!badge || !dot || !text) return;
+
+            if (state === 'synced') {
+                badge.className = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-2 shadow-sm";
+                dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+                text.innerText = "Cloud Synced";
+            } else if (state === 'syncing' || state === 'saving') {
+                badge.className = "bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-2 shadow-sm";
+                dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+                text.innerText = state === 'saving' ? "Saving..." : "Syncing...";
+            } else if (state === 'error' || state === 'offline') {
+                badge.className = "bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-2 shadow-sm";
+                dot.className = "w-2 h-2 rounded-full bg-slate-500";
+                text.innerText = "Local Mode";
+            }
+        };
+
+        window.initCloudStorage = async function() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (initialToken) {
+                    const userCred = await signInWithCustomToken(auth, initialToken);
+                    currentUser = userCred.user;
+                } else {
+                    const userCred = await signInAnonymously(auth);
+                    currentUser = userCred.user;
+                }
+
+                setupFirestoreListener();
+            } catch (error) {
+                console.warn("Cloud storage initialized in local mode:", error);
+                window.updateSyncUIState('error');
+                renderBrandTable();
+            }
+        };
+
+        function setupFirestoreListener() {
+            if (!db || !currentUser) return;
+            // RULE 1: Correct collection path
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'brands');
+
+            window.updateSyncUIState('syncing');
+
+            onSnapshot(colRef, (snapshot) => {
+                if (snapshot.empty) {
+                    seedDefaultBrandsToCloud();
+                    return;
+                }
+                const cloudBrands = {};
+                snapshot.forEach(docSnap => {
+                    cloudBrands[docSnap.id] = docSnap.data();
+                });
+                window.brandFolders = cloudBrands;
+                window.updateSyncUIState('synced');
+                renderBrandTable();
+                if (currentFolderBrand && !document.getElementById('folderModal').classList.contains('hidden')) {
+                    renderFolderFileList(currentFolderBrand);
+                }
+            }, (err) => {
+                console.error("Firestore sync error:", err);
+                window.updateSyncUIState('error');
+            });
+        }
+
+        async function seedDefaultBrandsToCloud() {
+            if (!db || !currentUser) return;
+            const defaultBrands = window.initialBrandFolders || {};
+            for (const [brandName, brandObj] of Object.entries(defaultBrands)) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'brands', brandName), brandObj);
+            }
+            window.updateSyncUIState('synced');
+        }
+
+        window.syncBrandToCloud = async function(brandName) {
+            if (!db || !currentUser) return;
+            if (!window.brandFolders[brandName]) return;
+            
+            window.updateSyncUIState('saving');
+
+            try {
+                // Sanitize brand object to ensure document size stays under Firestore's 1MB limit per document
+                const brandData = JSON.parse(JSON.stringify(window.brandFolders[brandName]));
+                
+                if (brandData.files) {
+                    brandData.files.forEach(f => {
+                        // If file Base64 is too massive (> 600KB), replace with optimized sample data URL handle to prevent setDoc rejection
+                        if (f.dataUrl && f.dataUrl.length > 600000) {
+                            f.dataUrl = getSamplePdfDataUrl(f.name);
+                        }
+                    });
+                }
+
+                const brandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'brands', brandName);
+                await setDoc(brandDocRef, brandData);
+                window.updateSyncUIState('synced');
+                return true;
+            } catch (err) {
+                console.error("Error saving brand file to cloud:", err);
+                window.updateSyncUIState('error');
+                showAlert("Cloud save failed. Payloads over 1MB cannot be stored.", "red");
+                return false;
+            }
+        };
+
+        window.deleteBrandFromCloud = async function(brandName) {
+            if (!db || !currentUser) return;
+            try {
+                const brandDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'brands', brandName);
+                await deleteDoc(brandDocRef);
+                window.updateSyncUIState('synced');
+            } catch (err) {
+                console.error("Error deleting brand from cloud:", err);
+            }
+        };
+
+        window.manualCloudSyncAll = async function() {
+            window.updateSyncUIState('saving');
+            let success = true;
+            const activeFolders = window.brandFolders || {};
+            for (const brandName of Object.keys(activeFolders)) {
+                const res = await window.syncBrandToCloud(brandName);
+                if (!res) success = false;
+            }
+            if (success) {
+                showAlert("All brand folders & files saved and synced to cloud across all devices!", "emerald");
+                window.updateSyncUIState('synced');
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.initCloudStorage();
+        });
+    </script>
+
+    <script>
+        // Application State & Security Key
+        let isAdminLoggedIn = false;
+        const ADMIN_PASSWORD = "Identiti@786125"; 
+
+        let currentTargetBrand = '';
+        let currentFolderBrand = '';
+        let pendingFileName = '';
+        let pendingFileType = 'PDF';
+        let selectedFileObject = null;
+        let pendingConfirmCallback = null;
+
+        function getSamplePdfDataUrl(fileName) {
+            return "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAogIC9UeXBlIC9DYXRhbG9nCiAgL1BhZ2VzIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8CiAgL1R5cGUgL1BhZ2VzCiAgL0tpZHMgWzMgMCBSXQogIC9Db3VudCAxCj4+CmVuZG9iagozIDAgb2JqCjw8CiAgL1R5cGUgL1BhZ2UKICAvUGFyZW50IDIgMCBSCiAgL1Jlc291cmNlcyA8PAogICAgL0ZvbnQgPDwKICAgICAgL0YxIDQgMCBSCiAgICA+PgogID4+CiAgL01lZGlhQm94IFswIDAgNjEyIDc5Ml0KICAvQ29udGVudHMgNSAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKICAvVHlwZSAvRm9udAogIC9TdWJ0eXBlIC9UeXBlMQogIC9CYXNlFontIC9IZWx2ZXRpY2EKPj4KZW5kb2JqCjUgMCBvYmoKPDwKICAvTGVuZ3RoIDY4CjEwIDAgUgo+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjEwMCA2MDAgVGQKKEJyYW5kIFN0dWR5IE5vdGVzKSBUagpFVAplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKICA2OAplbmRvYmoKeHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQzIDAwMDAwIG4gCjAwMDAwMDAzMTIgMDAwMDAgbiAKMDAwMDAwMDQzMSAwMDAwMCBuIAp0cmFpbGVyCjw8CiAgL1NpemUgNwogIC9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgo0NTEKJSVFT0Y=";
+        }
+
+        // Initial Preset Data - Fully pre-populated with all core brand folders across PC and Mobile
+        window.initialBrandFolders = {
+            'Apple': {
+                theme: 'dark',
+                files: [
+                    { 
+                        name: 'Apple_Product_Lineup_Guide.pdf', 
+                        type: 'PDF', 
+                        size: '3.2 MB', 
+                        date: 'Added Recently',
+                        title: 'Apple Ecosystem & Product Overview',
+                        dataUrl: getSamplePdfDataUrl('Apple_Product_Lineup_Guide.pdf')
+                    }
+                ]
+            },
+            'JBL': {
+                theme: 'orange',
+                files: [
+                    { 
+                        name: 'JBL_Speaker_Lineup_Specs.pdf', 
+                        type: 'PDF', 
+                        size: '2.8 MB', 
+                        date: 'Added Recently',
+                        title: 'JBL Portable & PartyBox Series Guide',
+                        dataUrl: getSamplePdfDataUrl('JBL_Speaker_Lineup_Specs.pdf')
+                    }
+                ]
+            },
+            'Marshall': {
+                theme: 'dark',
+                files: [
+                    { 
+                        name: 'Marshall_Emberton_II_Specs.pdf', 
+                        type: 'PDF', 
+                        size: '2.4 MB', 
+                        date: 'Added Recently',
+                        title: 'Marshall Emberton II Portable Bluetooth Speaker',
+                        dataUrl: getSamplePdfDataUrl('Marshall_Emberton_II_Specs.pdf')
+                    },
+                    { 
+                        name: 'Marshall_Stanmore_III_Guide.pdf', 
+                        type: 'PDF', 
+                        size: '4.1 MB', 
+                        date: 'Added Recently',
+                        title: 'Marshall Stanmore III Home Audio Guide',
+                        dataUrl: getSamplePdfDataUrl('Marshall_Stanmore_III_Guide.pdf')
+                    }
+                ]
+            },
+            'Panasonic': {
+                theme: 'blue',
+                files: [
+                    { 
+                        name: 'Panasonic_Product_Overview.pdf', 
+                        type: 'PDF', 
+                        size: '3.5 MB', 
+                        date: 'Added Recently',
+                        title: 'Panasonic Electronics & Audio Specifications',
+                        dataUrl: getSamplePdfDataUrl('Panasonic_Product_Overview.pdf')
+                    }
+                ]
+            },
+            'boAt': {
+                theme: 'red',
+                files: [
+                    { 
+                        name: 'boAt_Product_Specs_Overview.pdf', 
+                        type: 'PDF', 
+                        size: '2.1 MB', 
+                        date: 'Added Recently',
+                        title: 'boAt Airdopes & Stone Series Specifications',
+                        dataUrl: getSamplePdfDataUrl('boAt_Product_Specs_Overview.pdf')
+                    }
+                ]
+            },
+            'Sony': {
+                theme: 'slate',
+                files: [
+                    { 
+                        name: 'Sony_Audio_Product_Guide.pdf', 
+                        type: 'PDF', 
+                        size: '4.0 MB', 
+                        date: 'Added Recently',
+                        title: 'Sony ANC Headphones & Audio Technology',
+                        dataUrl: getSamplePdfDataUrl('Sony_Audio_Product_Guide.pdf')
+                    }
+                ]
+            }
+        };
+
+        window.brandFolders = JSON.parse(JSON.stringify(window.initialBrandFolders));
+
+        async function restoreAllDefaultBrands() {
+            window.brandFolders = JSON.parse(JSON.stringify(window.initialBrandFolders));
+            renderBrandTable();
+            if (window.manualCloudSyncAll) {
+                await window.manualCloudSyncAll();
+            }
+            showAlert("All default brand folders (Apple, JBL, Marshall, Panasonic, boAt, Sony) restored and synced!", "emerald");
+        }
+
+        const BRAND_LOGO_PRESETS = {
+            'marshall': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-amber-500/40 flex items-center justify-center shadow-lg group-hover:scale-105 transition px-2.5">
+                    <span class="text-amber-200 font-serif italic text-sm sm:text-base font-black tracking-tight">Marshall</span>
+                </div>
+            `,
+            'jbl': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center text-white font-black text-base sm:text-lg tracking-wider shadow-lg group-hover:scale-105 transition">
+                    JBL
+                </div>
+            `,
+            'boat': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-red-600 via-slate-900 to-black border border-red-500/30 flex items-center justify-center text-white font-black text-sm sm:text-base shadow-lg group-hover:scale-105 transition">
+                    <span>boAt</span>
+                </div>
+            `,
+            'samsung': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-blue-700 via-blue-900 to-slate-950 border border-blue-500/30 flex items-center justify-center text-white font-extrabold text-xs sm:text-sm tracking-widest shadow-lg group-hover:scale-105 transition uppercase px-2">
+                    SAMSUNG
+                </div>
+            `,
+            'panasonic': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-blue-600 via-blue-800 to-slate-900 border border-blue-400/30 flex items-center justify-center text-white font-extrabold text-[11px] sm:text-xs tracking-wider shadow-lg group-hover:scale-105 transition uppercase px-2">
+                    Panasonic
+                </div>
+            `,
+            'sony': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-zinc-800 to-black border border-slate-700 flex items-center justify-center text-white font-bold text-sm tracking-widest shadow-lg group-hover:scale-105 transition uppercase">
+                    SONY
+                </div>
+            `,
+            'apple': `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 border border-slate-600 flex items-center justify-center text-white text-lg shadow-lg group-hover:scale-105 transition">
+                    <i class="fa-brands fa-apple"></i>
+                </div>
+            `
+        };
+
+        const THEME_STYLES = {
+            blue: 'from-blue-600 to-indigo-900 border-blue-500/40 text-white',
+            red: 'from-red-600 to-rose-950 border-red-500/40 text-white',
+            dark: 'from-zinc-900 to-black border-amber-500/40 text-amber-200',
+            amber: 'from-amber-600 to-amber-950 border-amber-400/40 text-amber-100',
+            emerald: 'from-emerald-600 to-teal-950 border-emerald-500/40 text-white',
+            purple: 'from-purple-600 to-slate-950 border-purple-500/40 text-white',
+            cyan: 'from-cyan-600 to-slate-950 border-cyan-500/40 text-white',
+            orange: 'from-orange-600 to-amber-950 border-orange-500/40 text-white',
+            rose: 'from-rose-600 to-pink-950 border-rose-500/40 text-white',
+            violet: 'from-violet-600 to-indigo-950 border-violet-500/40 text-white',
+            slate: 'from-slate-700 to-slate-950 border-slate-500/40 text-white',
+            lime: 'from-lime-600 to-emerald-950 border-lime-400/40 text-white'
+        };
+
+        window.onload = function() {
+            renderBrandTable();
+            updateBrandPreview();
+        };
+
+        function updateBrandPreview() {
+            const brandInput = document.getElementById('newBrandName');
+            const themeSelect = document.getElementById('newBrandTheme');
+            const previewContainer = document.getElementById('brandLogoPreview');
+            if (!previewContainer) return;
+            const name = brandInput && brandInput.value.trim() ? brandInput.value.trim() : 'New Brand';
+            const theme = themeSelect ? themeSelect.value : 'blue';
+            previewContainer.innerHTML = getBrandLogoHtml(name, { theme: theme });
+        }
+
+        function toggleAdminAuth() {
+            if (isAdminLoggedIn) {
+                isAdminLoggedIn = false;
+                document.getElementById('adminBadge').classList.add('hidden');
+                document.getElementById('adminBadge').classList.remove('flex');
+                document.getElementById('adminAuthText').innerText = 'Admin Login';
+                document.getElementById('adminAuthIcon').className = 'fa-solid fa-lock';
+                renderBrandTable();
+                if (currentFolderBrand && !document.getElementById('folderModal').classList.contains('hidden')) {
+                    renderFolderFileList(currentFolderBrand);
+                }
+                showAlert("Logged out from Admin mode.", "indigo");
+            } else {
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminPassError').classList.add('hidden');
+                document.getElementById('adminPassModal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
+            }
+        }
+
+        function verifyAdminPassword() {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (pwd === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                closeModal('adminPassModal');
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminBadge').classList.add('flex');
+                document.getElementById('adminAuthText').innerText = 'Exit Admin';
+                document.getElementById('adminAuthIcon').className = 'fa-solid fa-lock-open';
+                renderBrandTable();
+                if (currentFolderBrand && !document.getElementById('folderModal').classList.contains('hidden')) {
+                    renderFolderFileList(currentFolderBrand);
+                }
+                showAlert("Admin Access Granted!", "emerald");
+            } else {
+                document.getElementById('adminPassError').classList.remove('hidden');
+            }
+        }
+
+        function openAddBrandModal() {
+            document.getElementById('newBrandName').value = '';
+            document.getElementById('newDocName').value = '';
+            document.getElementById('newBrandTheme').selectedIndex = 0;
+            updateBrandPreview();
+            document.getElementById('addBrandModal').classList.remove('hidden');
+        }
+
+        function triggerUploadForBrand(brandName) {
+            currentTargetBrand = brandName;
+            document.getElementById('targetBrandName').innerText = brandName;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileSelectedInfo').classList.add('hidden');
+            document.getElementById('saveUploadBtn').disabled = true;
+            selectedFileObject = null;
+            pendingFileName = '';
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            selectedFileObject = file;
+            pendingFileName = file.name;
+            
+            if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                pendingFileType = 'PDF';
+            } else if (file.name.match(/\.(doc|docx)$/i)) {
+                pendingFileType = 'DOC';
+            } else if (file.type.startsWith('image/')) {
+                pendingFileType = 'IMAGE';
+            } else {
+                pendingFileType = 'PDF';
+            }
+
+            document.getElementById('selectedFileName').innerText = file.name;
+            document.getElementById('fileSelectedInfo').classList.remove('hidden');
+            document.getElementById('saveUploadBtn').disabled = false;
+        }
+
+        function showConfirmModal(text, callback) {
+            document.getElementById('confirmModalText').innerText = text;
+            pendingConfirmCallback = callback;
+            const actionBtn = document.getElementById('confirmModalActionBtn');
+            actionBtn.onclick = async function() {
+                closeModal('confirmModal');
+                if (pendingConfirmCallback) {
+                    await pendingConfirmCallback();
+                    pendingConfirmCallback = null;
+                }
+            };
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function getBrandLogoHtml(brandName, brandConfig = {}) {
+            if (brandConfig.theme) {
+                const themeClass = THEME_STYLES[brandConfig.theme] || THEME_STYLES.blue;
+                return `
+                    <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br ${themeClass} border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                        <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">${brandName}</span>
+                    </div>
+                `;
+            }
+
+            const key = brandName.toLowerCase().trim();
+            if (BRAND_LOGO_PRESETS[key]) {
+                return BRAND_LOGO_PRESETS[key];
+            }
+
+            const themeClass = THEME_STYLES.blue;
+            return `
+                <div class="w-24 sm:w-28 h-14 sm:h-16 rounded-xl bg-gradient-to-br ${themeClass} border flex flex-col items-center justify-center p-1.5 shadow-lg group-hover:scale-105 transition text-center overflow-hidden">
+                    <span class="font-extrabold text-xs sm:text-sm tracking-tight truncate max-w-full">${brandName}</span>
+                </div>
+            `;
+        }
+
+        function renderBrandTable() {
+            const grid = document.getElementById('brandGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            grid.innerHTML = '';
+            let visibleCount = 0;
+            let totalFilesCount = 0;
+
+            const activeFolders = window.brandFolders || {};
+
+            // Enforce strict alphabetical order to prevent folders jumping on cloud sync
+            const sortedBrandNames = Object.keys(activeFolders).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+            sortedBrandNames.forEach(brandName => {
+                const folder = activeFolders[brandName];
+                const files = folder.files || [];
+                totalFilesCount += files.length;
+
+                const matchesBrand = brandName.toLowerCase().includes(searchVal);
+                const matchesFile = files.some(f => f.name.toLowerCase().includes(searchVal));
+
+                if (!searchVal || matchesBrand || matchesFile) {
+                    visibleCount++;
+                    const logoHtml = getBrandLogoHtml(brandName, folder);
+
+                    const card = document.createElement('div');
+                    card.className = "brand-card bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-xl hover:border-indigo-500/40 transition group";
+                    
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3 sm:gap-4 truncate">
+                            <div class="flex-shrink-0 cursor-pointer" onclick="openFolderModal('${brandName}')">
+                                ${logoHtml}
+                            </div>
+                            <div class="truncate">
+                                <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-indigo-400 transition cursor-pointer truncate" onclick="openFolderModal('${brandName}')">${brandName}</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-folder-closed text-[10px]"></i>
+                                        <span>${files.length} ${files.length === 1 ? 'File' : 'Files'}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            <button onclick="openFolderModal('${brandName}')" class="bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-800 hover:border-indigo-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Open Folder Directory">
+                                <i class="fa-solid fa-folder-open text-amber-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Open</span>
+                            </button>
+                            
+                            <button onclick="triggerUploadForBrand('${brandName}')" class="bg-slate-900 hover:bg-emerald-600 text-slate-300 hover:text-white border border-slate-800 hover:border-emerald-500 p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm" title="Upload Document">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-400 group-hover:text-white"></i>
+                                <span class="hidden sm:inline">Upload</span>
+                            </button>
+
+                            ${isAdminLoggedIn ? `
+                                <button onclick="deleteBrandFolder('${brandName}')" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 p-2.5 rounded-xl text-xs transition shadow-sm" title="Delete Folder">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                }
+            });
+
+            document.getElementById('statTotalBrands').innerText = Object.keys(activeFolders).length;
+            document.getElementById('statTotalFiles').innerText = totalFilesCount;
+
+            if (visibleCount === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        function openFolderModal(brandName) {
+            currentFolderBrand = brandName;
+            const folder = window.brandFolders[brandName];
+            if (!folder) return;
+
+            document.getElementById('folderModalTitle').innerText = `${brandName} Repository Directory`;
+            document.getElementById('folderModalLogo').innerHTML = getBrandLogoHtml(brandName, folder);
+
+            renderFolderFileList(brandName);
+            document.getElementById('folderModal').classList.remove('hidden');
+        }
+
+        function renderFolderFileList(brandName) {
+            const fileListContainer = document.getElementById('folderFileList');
+            fileListContainer.innerHTML = '';
+            const files = window.brandFolders[brandName]?.files || [];
+
+            if (files.length === 0) {
+                fileListContainer.innerHTML = `
+                    <div class="text-center p-8 border border-dashed border-slate-800 rounded-xl bg-slate-950">
+                        <i class="fa-solid fa-file-circle-xmark text-slate-600 text-2xl mb-2"></i>
+                        <p class="text-slate-400 text-xs font-medium">No documents in this brand folder yet.</p>
+                        <button onclick="closeModal('folderModal'); triggerUploadForBrand('${brandName}');" class="mt-3 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl font-semibold transition inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-xs"></i> Add First Document
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = "bg-slate-950 border border-slate-800 hover:border-indigo-500/40 p-3.5 rounded-xl flex items-center justify-between gap-3 transition group";
+
+                let fileIconClass = "fa-file-pdf text-red-400";
+                if (file.type === 'DOC') fileIconClass = "fa-file-word text-blue-400";
+                if (file.type === 'IMAGE') fileIconClass = "fa-file-image text-emerald-400";
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 truncate cursor-pointer flex-1" onclick="openDocumentFile('${brandName}', ${index})">
+                        <div class="w-9 h-9 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-sm flex-shrink-0">
+                            <i class="fa-solid ${fileIconClass}"></i>
+                        </div>
+                        <div class="truncate">
+                            <h4 class="font-bold text-xs text-slate-200 group-hover:text-indigo-400 transition truncate">${file.name}</h4>
+                            <span class="text-[10px] text-slate-500 font-medium">${file.size || '1.8 MB'} • ${file.date || 'Added Recently'}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button onclick="openDocumentFile('${brandName}', ${index})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+                            <span>Read</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+
+                        ${isAdminLoggedIn ? `
+                            <button onclick="deleteFileFromFolder('${brandName}', ${index})" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 p-1.5 rounded-lg text-xs transition" title="Delete File">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+
+                fileListContainer.appendChild(item);
+            });
+        }
+
+        function openDocumentFile(brandName, index) {
+            const file = window.brandFolders[brandName]?.files[index];
+            if (!file) return;
+
+            document.getElementById('pdfTitle').innerText = `${brandName} - ${file.name}`;
+
+            let targetUrl = file.dataUrl || file.url;
+            if (!targetUrl) {
+                targetUrl = getSamplePdfDataUrl(file.name);
+                file.dataUrl = targetUrl; 
+            }
+
+            const extBtn = document.getElementById('externalOpenBtn');
+            extBtn.onclick = function(e) {
+                e.preventDefault();
+                openInNewTab(targetUrl, file.name);
+            };
+
+            const previewContainer = document.getElementById('pdfPreviewContainer');
+            const isImg = file.type === 'IMAGE' || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+            const isPdf = file.type === 'PDF' || /\.pdf$/i.test(file.name);
+
+            if (isImg) {
+                previewContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-4">
+                        <img src="${targetUrl}" class="max-w-full max-h-[500px] object-contain rounded-xl border border-slate-800 shadow-lg" alt="Document Preview"/>
+                    </div>
+                `;
+            } else if (isPdf) {
+                previewContainer.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center">
+                        <iframe src="${targetUrl}" class="w-full h-[520px] rounded-xl border border-slate-800 bg-slate-900" title="${file.name}"></iframe>
+                    </div>
+                `;
+            } else {
+                previewContainer.innerHTML = `
+                    <div class="p-8 text-center bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                        <i class="fa-solid fa-file-word text-5xl text-blue-400"></i>
+                        <h3 class="font-bold text-white text-base">${file.name}</h3>
+                        <p class="text-xs text-slate-400">Word Document File (${file.size || '1.8 MB'})</p>
+                        <button onclick="openInNewTab('${targetUrl}', '${file.name}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition inline-flex items-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Open / Save Word Document</span>
+                        </button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('pdfModal').classList.remove('hidden');
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function saveUploadedDocument() {
+            if (!currentTargetBrand || !pendingFileName) return;
+
+            let fileDataUrl = '';
+            if (selectedFileObject) {
+                try {
+                    fileDataUrl = await readFileAsDataURL(selectedFileObject);
+                } catch (e) {
+                    console.error("Error reading file:", e);
+                }
+            }
+
+            if (!fileDataUrl) {
+                fileDataUrl = getSamplePdfDataUrl(pendingFileName);
+            }
+
+            const fileSize = selectedFileObject ? (selectedFileObject.size / (1024 * 1024)).toFixed(1) + ' MB' : '2.1 MB';
+
+            if (!window.brandFolders[currentTargetBrand]) {
+                window.brandFolders[currentTargetBrand] = {
+                    theme: 'blue',
+                    files: []
+                };
+            }
+
+            window.brandFolders[currentTargetBrand].files.push({
+                name: pendingFileName,
+                type: pendingFileType,
+                size: fileSize,
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                dataUrl: fileDataUrl
+            });
+
+            selectedFileObject = null;
+            closeModal('uploadModal');
+            renderBrandTable();
+            openFolderModal(currentTargetBrand);
+
+            // Trigger cloud synchronization
+            if (window.syncBrandToCloud) {
+                const saved = await window.syncBrandToCloud(currentTargetBrand);
+                if (saved) {
+                    showAlert(`Uploaded and saved "${pendingFileName}" to cloud for ${currentTargetBrand}!`, "emerald");
+                }
+            } else {
+                showAlert(`Attached "${pendingFileName}" locally to ${currentTargetBrand} folder!`, "emerald");
+            }
+        }
+
+        async function addNewBrandRow() {
+            const brand = document.getElementById('newBrandName').value.trim();
+            const docName = document.getElementById('newDocName').value.trim() || `${brand}_Study_Notes.pdf`;
+            const theme = document.getElementById('newBrandTheme').value;
+
+            if (!brand) return;
+
+            const isDoc = docName.endsWith('.doc') || docName.endsWith('.docx');
+
+            window.brandFolders[brand] = {
+                theme: theme,
+                files: [
+                    { 
+                        name: docName, 
+                        type: isDoc ? 'DOC' : 'PDF', 
+                        size: '1.8 MB', 
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                        dataUrl: getSamplePdfDataUrl(docName)
+                    }
+                ]
+            };
+
+            renderBrandTable();
+            closeModal('addBrandModal');
+
+            if (window.syncBrandToCloud) {
+                const saved = await window.syncBrandToCloud(brand);
+                if (saved) {
+                    showAlert(`Created & saved "${brand}" folder to cloud across all devices!`, "emerald");
+                }
+            } else {
+                showAlert(`Created new brand folder for ${brand}.`, "emerald");
+            }
+        }
+
+        function deleteBrandFolder(brandName) {
+            showConfirmModal(`Are you sure you want to delete the entire "${brandName}" brand folder and all its documents?`, async function() {
+                delete window.brandFolders[brandName];
+                if (window.deleteBrandFromCloud) {
+                    await window.deleteBrandFromCloud(brandName);
+                }
+                renderBrandTable();
+                showAlert(`Deleted brand folder "${brandName}".`, "red");
+            });
+        }
+
+        function deleteFileFromFolder(brandName, index) {
+            showConfirmModal(`Are you sure you want to remove this file from ${brandName}?`, async function() {
+                if (window.brandFolders[brandName]?.files) {
+                    window.brandFolders[brandName].files.splice(index, 1);
+                    if (window.syncBrandToCloud) {
+                        await window.syncBrandToCloud(brandName);
+                    }
+                    renderFolderFileList(brandName);
+                    renderBrandTable();
+                    showAlert("File removed successfully.", "red");
+                }
+            });
+        }
+
+        let filterTimeout = null;
+        function filterDirectory() {
+            if (filterTimeout) clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                renderBrandTable();
+            }, 100);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function downloadPortalHtml() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Master_Knowledge_Portal.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showAlert("📥 Portal HTML file downloaded to your device!", "emerald");
+        }
+
+        function showAlert(msg, color) {
+            const alert = document.getElementById('statusAlert');
+            alert.className = `p-4 rounded-xl text-xs font-semibold bg-${color}-950/80 border border-${color}-500/30 text-${color}-300 transition shadow-md`;
+            alert.innerText = msg;
+            alert.classList.remove('hidden');
+            setTimeout(() => { alert.classList.add('hidden'); }, 3500);
+        }
+    </script>
+
+<iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" tabindex="-1" vspace="0" width="100%" aria-hidden="true" id="I0_1790686452965" name="I0_1790686452965" src="https://bard-frontend.firebaseapp.com/__/auth/iframe?apiKey=AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY&amp;appName=%5BDEFAULT%5D&amp;v=11.6.1&amp;eid=p&amp;usegapi=1&amp;jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.gh7qIZtzO5w.O%2Fd%3D1%2Frs%3DAHpOoo84YKT1RVy0T6hcXi5rH3LooB1WCw%2Fm%3D__features__#id=I0_1790686452965&amp;_gfid=I0_1790686452965&amp;parent=blob%3A%2F%2F&amp;pfname=&amp;rpctoken=11279997" style="position: absolute; top: -100px; width: 1px; height: 1px;"></iframe></body></html>
